@@ -14,9 +14,7 @@
         <TaskList />
       </section>
       <section>
-        <h2>Leaderboard:</h2>
-        <LeaderboardControls />
-        <h2>Stats:</h2>
+        <h2>Leaderboard Stats:</h2>
         <LeaderboardStats />
       </section>
     </div>
@@ -28,7 +26,6 @@ import AddRobot from '../components/robots/AddRobot.vue';
 import BotList from '../components/robots/BotList.vue';
 import AddTasks from '../components/tasks/AddTasks.vue';
 import TaskList from '../components/tasks/TaskList.vue';
-import LeaderboardControls from '../components/leaderboard/LeaderboardControls.vue';
 import LeaderboardStats from '../components/leaderboard/LeaderboardStats.vue';
 
 export default {
@@ -38,7 +35,6 @@ export default {
     AddRobot,
     BotList,
     TaskList,
-    LeaderboardControls,
     LeaderboardStats
 
   }
