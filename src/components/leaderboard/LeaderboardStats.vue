@@ -3,7 +3,8 @@
     <div class="playerWrapper">
       <div v-for="robot in robots" :key="robot.id" class="player">
         <div class="progressbar-wrapper" style="transition: all .2s ease-in-out; height: 10px;background-color: black; width: 100%; border: 1px solid white;">
-          <div class="progress" :style="`height: 10px; background-color: lightgreen; width: ${1*10}%;`">
+          <div class="progress" :style="`height: 10px; background-color: lightgreen; width: ${Number.parseInt(countDown)}%;`">
+            {{ countDown }}
             {{ robot.tasks[0].description }}
           </div>
         </div>
@@ -19,6 +20,7 @@
     data: function () {
       return {
         robots: [],
+        countDown: 0,
       }
     },
     mounted: function () {
@@ -53,13 +55,16 @@
       },
       createTimer: function () {
         // create a timer for each robot
-        let timeleft = 10;
-        let robotProgress = setInterval(function(){
-          if(timeleft <= 0){
+        console.log('create timer');
+        let timeleft = 0;
+        let robotProgress = setInterval(() => {
+          this.countDown = timeleft * 10;
+          console.log(this.countDown);
+          if(timeleft >= 10){
             clearInterval(robotProgress);
           }
-          document.getElementById("progressBar").value = 10 - timeleft;
-          timeleft -= 1;
+          
+          timeleft += 1;
         }, 1000);
       }
     },
