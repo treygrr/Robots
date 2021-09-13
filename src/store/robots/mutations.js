@@ -67,3 +67,9 @@ export function ASSIGN_TASKS_TO_ROBOT(state, { robotId, taskId }) {
   };
   state.robotsTasks.push(newTask);
 }
+
+export function RESET_COMPLETED_TASKS(state) {
+  state.robotsTasks.forEach((task) => {
+    task.complete = false;
+  });
+}
