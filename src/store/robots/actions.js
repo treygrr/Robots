@@ -1,6 +1,9 @@
+export async function addRobot({ /* state, */ commit }, payload) {
+  const robot = payload;
+  return commit("ADD_ROBOT", robot);
+}
 
-// Handles any type of user repo requests
-export async function save(/* { state, commit }, payload */) {
-  // save robotType
-  
+export async function assignTasksToRobot({ /* state, */ commit }, payload) {
+  const { robot, tasks } = payload;
+  return commit("ASSIGN_TASKS_TO_ROBOT", { robot, tasks });
 }

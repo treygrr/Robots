@@ -26,8 +26,7 @@
         return this.$store.state.robotTypes.robotTypes.find(robot => robot.id === robotId).name;
       },
       deleteTask: function(taskId) {
-        alert(taskId);
-        this.$store.commit('tasks/DELETE_TASK', taskId);
+        this.$store.state.commit('tasks/DELETE_TASK', taskId);
       },
     },
   }

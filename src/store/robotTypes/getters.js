@@ -1,3 +1,3 @@
-export function getTypes(state) {
+export function getRobotTypes(state) {
   return state.robotTypes;
 }

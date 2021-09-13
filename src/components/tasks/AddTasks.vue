@@ -4,10 +4,9 @@
     <input type="number" v-model="time" placeholder="Seconds to complete">
 
     <select multiple v-if="robotTypes" v-model="completeableBy">
-      <option selected hidden>Select all who can complete this task?</option>
       <option v-for="robotType in robotTypes" :value="robotType.id" :key="robotType.id">{{ robotType.name }}</option>
     </select>
-    <button action="submit">Add Robot</button>
+    <button action="submit">Add Task</button>
   </form>
 </template>
 
@@ -18,7 +17,7 @@
       return {
         description: null,
         time: null,
-        completeableBy: 'Select all who can complete this task?'
+        completeableBy: null,
       }
     },
     computed: {
@@ -49,7 +48,10 @@
           alert(errors.join('\n'));
           return;
         }
-        console.log(this.description, this.time, this.completeableBy);
+        this.$store.commit('tasks/ADD_TASK', { description: this.description, eta: this.time * 1000, completeableBy: this.completeableBy});
+        this.description = null;
+        this.time = null;
+        this.completeableBy = 0;
       }
     }
   }

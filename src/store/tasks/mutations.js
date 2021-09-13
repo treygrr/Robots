@@ -1,49 +1,26 @@
 import { getNextId } from "../../mixins/storeHelpers";
 
-const defaultState = [
-  {
-    id: 0,
-    type: "UNIPEDAL",
-    name: "Unipedal",
-  },
-  {
-    id: 1,
-    type: "BIPEDAL",
-    name: "Bipedal",
-  },
-  {
-    id: 2,
-    type: "QUADRUPEDAL",
-    name: "Quadrupedal",
-  },
-  {
-    id: 3,
-    type: "ARACHNID",
-    name: "Arachnid",
-  },
-  {
-    id: 4,
-    type: "RADIAL",
-    name: "Radial",
-  },
-  {
-    id: 5,
-    type: "AERONAUTICAL",
-    name: "Aeronautical",
-  },
-];
-
-export function RESET_TYPES(state) {
-  // reset state here to default types provided
-  state.robotTypes = defaultState;
+export function ADD_TASK(state, task) {
+  const nextId = getNextId(state.tasks);
+  const newTask = {
+    id: nextId,
+    description: task.description,
+    eta: task.eta,
+    completeableBy: task.completeableBy,
+  };
+  state.tasks.push(newTask);
 }
 
-export function ADD_TYPE(state, robotTypes) {
-  const nextId = getNextId(state.robotTypes);
-  const newType = {
-    id: nextId,
-    type: robotTypes.type,
-    name: robotTypes.name,
-  };
-  state.robotTypes.push(newType);
+export function DELETE_TASK(state, taskId) {
+  // search an array and find the index of the matching id
+  const indexOfTask = state.tasks.findIndex((task) => task.id === taskId);
+
+  for (let i = 0; i < this.state.robots.robotsTasks.length; i++) {
+    if (this.state.robots.robotsTasks[i].taskId === taskId) {
+      this.state.robots.robotsTasks.splice(i, 1);
+    }
+  }
+
+  console.log("Task id to be removed: ", indexOfTask);
+  state.tasks.splice(indexOfTask, 1);
 }

@@ -11,3 +11,20 @@ export function getNextId(arr) {
   });
   return nextId;
 }
+
+export function getRandomTasks(array, count) {
+  // this gets a random sample of items from an array
+  const howMany = count? count : 5;
+  // default to 5 if count is not specified
+  let items = [];
+  let randomItems = [];
+  while (items.length < howMany) {
+    let randomIndex = Math.floor(Math.random() * array.length);
+    if (items.indexOf(randomIndex) === -1) {
+      // checks to see if the random index has already been added to the items array
+      items.push(randomIndex);
+      randomItems.push(array[randomIndex]);
+    }
+  }
+  return randomItems;
+}
