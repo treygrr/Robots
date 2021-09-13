@@ -1,17 +1,15 @@
 <template>
   <article class="leaderboard-controls">
-      <button @click="startSimulation">Start Simulation</button>
-      <button @click="stopSimulation">Stop Simulation</button>
-      <button @click="this.setRobots()">Reset Simulation</button>
+      <button @click="this.setRobots();this.eachRobot();">Start Simulation</button>
+      <button @click="this.setRobots();this.clearTimers();">Reset Simulation</button>
   </article>
   <article class="leaderboard-controls">
     <div class="playerWrapper">
-      <div v-for="robot in robots" :key="robot.id" class="player">
-        
-        {{ robot.robot.name }}
-        {{ robot }}
-        <div v-for="task in robot.tasks" :key="task.id" class="progressbar-wrapper">
-          <p>{{ getTaskById(task.id).description }}</p>
+      <div v-for="robot in stats" :key="robot.id" class="player">
+        <p><strong>{{ robot.robot.name }}</strong>
+        Score: {{ robot.robot.tasksComplete? robot.robot.tasksComplete: '0' }} / 5</p>
+        <div v-for="task in robot.tasks" :key="task.id" class="progressbar-wrapper" :style="task.failed? 'background-color: red;': ''">
+          <p>{{ getTaskById(task.taskId).description }}</p>
           <div class="progress" :style="`width: ${Number.parseInt(task.completedPercent)}%;`">
           </div>
         </div>
@@ -25,39 +23,95 @@
     name: 'LeaderboardStats',
     data: function () {
       return {
-        robots: [],
+        stats: [],
         countDown: 0,
+        timers: [],
       }
     },
+    computed: {
+      robots() {
+        return this.$store.state.robots.robots;
+      },
+      robotsCount() {
+        return this.$store.state.robots.robots.length;
+      },
+      robotsTasks() {
+        return this.$store.state.robots.robotsTasks;
+      },
+      robotsTasksCount() {
+        return this.$store.state.robots.robotsTasks.length;
+      },
+      tasksList() {
+        return this.$store.state.tasks.tasks;
+      },
+      tasksListCount() {
+        return this.$store.state.tasks.tasks.length;
+      },
+    },
+    watch: {
+      robotsCount() {
+        this.setRobots();
+      },
+      robotsTasksCount() {
+        this.setRobots();
+      },
+      tasksListCount() {
+        this.setRobots();
+      },
+    },
+
     mounted: function () {
       this.setRobots();
-      this.eachRobot()
     },
     methods: {
       getTaskById: function (id) {
         return this.$store.state.tasks.tasks.find(task => task.id === id);
       },
+      clearTimers: function () {
+        this.timers.forEach(timer => {
+          clearInterval(timer);
+        });
+      },
+      canRobotCompleteTask: function (robot, taskId) {
+        const completeableBy = this.getTaskById(taskId).completeableBy;
+        const robotTypes = this.$store.state.robotTypes.robotTypes;
+        const currentRobotType = robot.robot.type;
+
+        let completeableByStrings = [];
+        completeableBy.forEach(type => {
+          completeableByStrings.push(robotTypes.find(robotType => robotType.id === type).name);
+        });
+
+        let doable = false;
+        completeableByStrings.forEach(type => {
+          if (type === currentRobotType) {
+            doable = true;
+          }
+        });
+        return doable;
+      },
       setRobots: function () {
-        this.$store.state.robots.robots.forEach(robot => {
+        this.stats = [];
+        this.clearTimers();
+        this.$store.commit('robots/RESET_COMPLETED_TASKS');
+
+        this.robots.forEach(robot => {
           let robotData = {
             robot,
             tasks: this.$store.state.robots.robotsTasks.filter(function (task) { return task.robotId === robot.id }),
           }
+          robotData.robot.tasksComplete = 0;
+
           robotData.tasks.forEach(task => {
             task.completedPercent = 0;
+            task.failed = false;
           });
             
-          this.robots.push(robotData);
-          console.log(this.robots)
+          this.stats.push(robotData);
         });
       },
-      canRobotDoTask: function (/* robot, task */) {
-        // take current robot type and check against completeableBy array list to see if the bot can do it
-        // and return true or false
-        return true;
-      },
       eachRobot: function (/* robot */) {
-        this.robots.forEach(robot => {
+        this.stats.forEach(robot => {
           this.eachRobotsQueue(robot);
         });
       },
@@ -68,22 +122,25 @@
         // start the timer if they can do it
         // when timer ends set completed to true
         // start next task
-        robot.tasks.every(task => {
-          console.log(task);
-            if (!this.canRobotDoTask(robot, task)) {
-              task.completed = true;
-              task.completedPercent = 0;
+        console.log(robot)
+        let tasks = robot.tasks;
+        for (let i = 0; i < tasks.length; i++) {
+            if (!tasks[i].complete && tasks[i].completedPercent < 100){
+              if (!this.canRobotCompleteTask(robot, tasks[i].taskId)) {
+                tasks[i].complete = true;
+                tasks[i].failed = true;
+                tasks[i].completedPercent = 0;
+              } else {
+              this.createTimer(tasks[i], robot);
+              break;
             }
-            if (!task.completed && task.completedPercent === 0){
-              this.createTimer(task, robot);
-            }
-        });
+          }
+        }
       },
       createTimer: function (task, robot) {
         let completedPercent = task.completedPercent;
-        let eta = this.getTaskById(task.id).eta;
+        let eta = this.getTaskById(task.taskId).eta;
         let seconds = Number.parseInt(((eta % 60000) / 1000).toFixed(0));
-        console.log(eta, seconds);
         let elapsedTime = 0;
         (100 * elapsedTime) / seconds;
         let interval = setInterval(() => {
@@ -92,29 +149,51 @@
           task.completedPercent = completedPercent;
           if (completedPercent >= 100) {
             clearInterval(interval);
-            console.log('timer ended and alled eachrobots que')
+            robot.robot.tasksComplete++;
+            console.log('here is the bot', robot.robot.tasksComplete);
             this.eachRobotsQueue(robot);
             task.complete = true;
           }
         }, 1000);
-        
+        this.timers.push(interval);
       }
     },
   }
 </script>
 
 <style scoped>
+button {
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  font-weight: bold;
+  color: #2c3e50;
+  background-color: lightslategray;
+  border-radius: 4px;
+  border: 1px solid #2c3e50;
+  box-shadow: 0 4px #2c3e50;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  background-color: #42b983;
+  box-shadow: 0 0px #2c3e50;
+  transform: translateY(4px);
+}
 .progressbar-wrapper {
   position:relative;
   transition: all .2s ease-in-out;
   height: 40px;
   background-color: black;
-  width: 100%;
+  width: calc(100% - 20px);
   border: 1px solid white;
   box-sizing: border-box;
+  border-radius: 4px;
+  margin: 10px auto;
 }
 .progressbar-wrapper > p {
-position: absolute;
+  position: absolute;
+  color: white;
   width: 100%;
   top: 0;
   left: 0;
