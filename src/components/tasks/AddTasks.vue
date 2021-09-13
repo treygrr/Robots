@@ -17,7 +17,7 @@
       return {
         description: null,
         time: null,
-        completeableBy: null,
+        completeableBy: [],
       }
     },
     computed: {
@@ -57,7 +57,6 @@
   }
 </script>
 
-<style scoped>
 <style scoped>
 form {
   width: 100%;
