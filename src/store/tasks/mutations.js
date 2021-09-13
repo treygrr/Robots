@@ -20,7 +20,5 @@ export function DELETE_TASK(state, taskId) {
       this.state.robots.robotsTasks.splice(i, 1);
     }
   }
-
-  console.log("Task id to be removed: ", indexOfTask);
   state.tasks.splice(indexOfTask, 1);
 }
