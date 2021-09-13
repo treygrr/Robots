@@ -3,7 +3,7 @@
     <input type="text" v-model="name" placeholder="Robot Name">
     <select v-model="selectedType">
       <option selected hidden>Select Robot Type</option>
-      <option v-for="robotType in robotTypes" :value="robotType.type" :key="robotType.id">{{ robotType.name }}</option>
+      <option v-for="robotType in robotTypes" :value="robotType.name" :key="robotType.id">{{ robotType.name }}</option>
     </select>
     <button action="submit">Add Robot</button>
   </form>
