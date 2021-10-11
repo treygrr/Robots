@@ -1,7 +1,4 @@
 # bot-o-mat-treygrr
-
-  # Message
-  Thank you for taking the time to review my project! This is my second shot at Red Ventures. Since I learned about the company and interviewed with Brittan Lynch I have wanted to work here! I can't wait to talk with you!
   
 ## Tasks
 - Allow users to create a robo ✅
